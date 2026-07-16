@@ -1,98 +1,137 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+import { AppBadge } from "@/components/ui/AppBadge";
+import { AppButton } from "@/components/ui/AppButton";
+import { AppCard } from "@/components/ui/AppCard";
+import { AppInput } from "@/components/ui/AppInput";
+import { AppLoader } from "@/components/ui/AppLoader";
+import { AppModal } from "@/components/ui/AppModal";
+import { PasswordInput } from "@/components/ui/PasswordInput";
+import { ScreenContainer } from "@/components/ui/ScreenContainer";
+import { colors } from "@/constants/colors";
+import { spacing } from "@/constants/spacing";
+import { typography } from "@/constants/typography";
 
 export default function HomeScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+    <ScreenContainer scrollable keyboardAvoiding>
+      <View style={styles.container}>
+        <Text style={styles.title}>Inventary-Stokk</Text>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+        <Text style={styles.subtitle}>
+          Prueba de componentes del Sprint 1
+        </Text>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+        <AppCard>
+          <View style={styles.cardContent}>
+            <Text style={styles.cardTitle}>Producto de prueba</Text>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+            <View style={styles.badges}>
+              <AppBadge label="Disponible" variant="success" />
+              <AppBadge label="Stock bajo" variant="warning" />
+              <AppBadge label="Agotado" variant="danger" />
+            </View>
+          </View>
+        </AppCard>
+
+        <AppInput
+          label="Correo electrónico"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="correo@ejemplo.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        <PasswordInput
+          value={password}
+          onChangeText={setPassword}
+        />
+
+        <AppButton
+          title="Abrir modal"
+          onPress={() => setModalVisible(true)}
+        />
+
+        <AppButton
+          title="Cancelar"
+          variant="secondary"
+          onPress={() => console.log("Cancelar")}
+        />
+
+        <AppButton
+          title="Guardar"
+          variant="success"
+          onPress={() => console.log({ email, password })}
+        />
+
+        <AppLoader message="Cargando productos..." />
+
+        <AppModal
+          visible={modalVisible}
+          title="Modal de prueba"
+          onClose={() => setModalVisible(false)}
+        >
+          <Text style={styles.modalText}>
+            Los componentes base están funcionando correctamente.
+          </Text>
+
+          <View style={styles.modalButton}>
+            <AppButton
+              title="Cerrar"
+              onPress={() => setModalVisible(false)}
+            />
+          </View>
+        </AppModal>
+      </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+    gap: spacing.lg,
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
+
   title: {
-    textAlign: 'center',
+    color: colors.textPrimary,
+    fontSize: typography.sizes.heading,
+    fontWeight: typography.weights.bold,
   },
-  code: {
-    textTransform: 'uppercase',
+
+  subtitle: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.body,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+
+  cardContent: {
+    gap: spacing.md,
+  },
+
+  cardTitle: {
+    color: colors.textPrimary,
+    fontSize: typography.sizes.body,
+    fontWeight: typography.weights.semiBold,
+  },
+
+  badges: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+  },
+
+  modalText: {
+    color: colors.textSecondary,
+    fontSize: typography.sizes.body,
+  },
+
+  modalButton: {
+    marginTop: spacing.lg,
   },
 });
