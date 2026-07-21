@@ -1,33 +1,33 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  type TextInputProps,
+} from "react-native";
 
 import { colors } from "@/constants/colors";
 import { typography } from "@/constants/typography";
 
 import { AppInput } from "./AppInput";
 
-type PasswordInputProps = {
+type PasswordInputProps = Omit<TextInputProps, "secureTextEntry"> & {
   label?: string;
-  value: string;
-  onChangeText: (value: string) => void;
-  placeholder?: string;
   error?: string;
 };
 
 export function PasswordInput({
   label = "Contraseña",
-  value,
-  onChangeText,
   placeholder = "Ingresa tu contraseña",
   error,
+  ...textInputProps
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <AppInput
+      {...textInputProps}
       label={label}
-      value={value}
-      onChangeText={onChangeText}
       placeholder={placeholder}
       error={error}
       secureTextEntry={!showPassword}
